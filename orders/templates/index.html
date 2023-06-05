@@ -6,32 +6,34 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.3/js/jquery.tablesorter.min.js"></script>
     <link rel="stylesheet" href="{% static 'styles.css' %}">
-    <style>
-        .filtered {
-            display: none;
-        }
-
-        .filter-menu {
-            position: absolute;
-            background-color: white;
-            border: 1px solid #ccc;
-            padding: 5px;
-            list-style: none;
-        }
-
-        .filter-menu li {
-            cursor: pointer;
-            padding: 5px;
-        }
-    </style>
+    <link rel="stylesheet" href="{% static 'footable.bootstrap.min.css' %}">
+    <script type="text/javascript" src="{% static 'footable.min.js' %}"></script>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
-    <form id="myForm">
-        <input type="text" name="inputData" id="inputData">
-        <input type="checkbox" id="myCheckbox" name="myCheckbox">
-        <label for="myCheckbox">Партнерский склад</label>
-        <button type="submit">Отправить</button>
-    </form>
+	
+	
+        <div class="container login-form">
+        <h2 class="login-title">- Запрос таблиц -</h2>
+        <div class="panel panel-default">
+                <div class="panel-body">
+                        <form id="myForm">
+                                <div class="input-group login-userinput">
+                                        <span class="input-group-addon"><i class="fa-solid fa-gear" id="spinner"></i></span>
+                                        <input id="inputData" type="text" class="form-control" name="inputData" placeholder="Номер">
+                                </div>
+
+                                <button class="btn btn btn-outline-dark" style="width:100%;" type="submit" id="submitbutton"><i class="fa fa-search"></i> Запрос</button>
+                                <div class="checkbox login-options">
+                                        <label><input type="checkbox" id="myCheckbox" name="myCheckbox"/> Партнерский склад</label>
+
+                                </div>
+                        </form>
+                </div>
+        </div>
+</div>
 
     <div id="resultTable"></div>
 
@@ -55,6 +57,8 @@
                 e.preventDefault();
                 var inputVal = $("#inputData").val();
                 var checkboxVal = $("#myCheckbox").is(":checked");
+		var knopka = document.getElementById("spinner");
+                knopka.classList.add("fa-spin");
 
                 $.ajax({
                     url: "/process_data/",
@@ -66,34 +70,38 @@
                     success: function(response) {
                         var tableNames = response.table_names;
                         var tables = response.tables;
+			var element = document.getElementById("spinner");
+			element.classList.remove("fa-spin");
                         if (tables && tables.length > 0) {
                             var resultHtml = '';
+			    
                             for (var i = 0; i < tables.length; i++) {
                                 var tableName = tableNames[i];
                                 var tableData = JSON.parse(tables[i]);
-
-                                resultHtml += "<div>";
+				var allkeys = Object.keys(tableData[0]);
+                                resultHtml += "<div class='divtable'>";
                                 resultHtml += "<h3>Таблица " + tableName + "</h3>";
-                                resultHtml += "<table id='table" + i + "' class='sortable'>";
-                                resultHtml += "<thead><tr>";
-                                resultHtml += "<th class='column1'>Номер</th>";
-                                resultHtml += "<th class='column2'>Поставщик</th>";
-                                resultHtml += "<th class='column3'>Наименование</th>";
-                                resultHtml += "<th class='column4'>Склад</th>";
-                                resultHtml += "<th class='column5'>Количество</th>";
-                                resultHtml += "<th class='column6'>Цена</th>";
-                                resultHtml += "<th class='column7'>Корзина</th>";
+				
+                                resultHtml += "<table id='table" + i + "' class='table table-striped footable footable-1 footable-filtering footable-filtering-right footable-paging footable-paging-center breakpoint-lg'>";
+                                resultHtml += "<thead><tr class='footable-header'>";
+				for (var n = 0; n < allkeys.length; n++ ){
+					if(n+1 == allkeys.length){
+						 resultHtml += "<th class='footable-sortable footable-last-visible' style='display: table-cell;'>"+ allkeys[n] + " <i class='fa-solid fa-arrows-up-down'></i></th>";
+					}else{
+						resultHtml += "<th class='footable-sortable' style='display: table-cell;'>"+ allkeys[n] +" <i class='fa-solid fa-arrows-up-down'></i></th>";
+					}
+
+
+				}
+         
                                 resultHtml += "</tr></thead>";
                                 resultHtml += "<tbody>";
                                 for (var j = 0; j < tableData.length; j++) {
                                     resultHtml += "<tr>";
-                                    resultHtml += "<td class='column1'>" + tableData[j].Номер + "</td>";
-                                    resultHtml += "<td class='column2'>" + tableData[j].Поставщик + "</td>";
-                                    resultHtml += "<td class='column3'>" + tableData[j].Наименование + "</td>";
-                                    resultHtml += "<td class='column4'>" + tableData[j].Склад + "</td>";
-                                    resultHtml += "<td class='column5'>" + tableData[j].Количество + "</td>";
-                                    resultHtml += "<td class='column6'>" + tableData[j].Цена + "</td>";
-                                    resultHtml += "<td class='column7'>" + tableData[j].Корзина + "</td>";
+				    for (var a = 0; a < allkeys.length; a++){
+				    	resultHtml += "<td style='display: table-cell;'>" + tableData[j][allkeys[a]] + "</td>";
+
+				    }
                                     resultHtml += "</tr>";
                                 }
                                 resultHtml += "</tbody></table></div>";
