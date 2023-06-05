@@ -1,0 +1,43 @@
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid black;
+  padding: 4px;
+  text-align: left;
+}
+
+th {
+  background-color: #f2f2f2;
+  cursor: pointer;
+}
+
+.column1 {
+  width: 5%;
+}
+
+.column2 {
+  width: 5%;
+}
+
+.column3 {
+  width: 60%;
+}
+
+.column4 {
+  width: 15%;
+}
+
+.column5 {
+  width: 5%;
+}
+
+.column6 {
+  width: 10%;
+}
+
+.column7 {
+  width: 10%;
+}

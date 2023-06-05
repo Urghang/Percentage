@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+{% load static %}
+<head>
+    <title>My Web App</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.3/js/jquery.tablesorter.min.js"></script>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <style>
+        .filtered {
+            display: none;
+        }
+
+        .filter-menu {
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 5px;
+            list-style: none;
+        }
+
+        .filter-menu li {
+            cursor: pointer;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <form id="myForm">
+        <input type="text" name="inputData" id="inputData">
+        <input type="checkbox" id="myCheckbox" name="myCheckbox">
+        <label for="myCheckbox">Партнерский склад</label>
+        <button type="submit">Отправить</button>
+    </form>
+
+    <div id="resultTable"></div>
+
+    <script>
+        $(document).ready(function() {
+            var csrftoken = getCookie('csrftoken');
+
+            function csrfSafeMethod(method) {
+                return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
+            }
+
+            $.ajaxSetup({
+                beforeSend: function(xhr, settings) {
+                    if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    }
+                }
+            });
+
+            $("#myForm").submit(function(e) {
+                e.preventDefault();
+                var inputVal = $("#inputData").val();
+                var checkboxVal = $("#myCheckbox").is(":checked");
+
+                $.ajax({
+                    url: "/process_data/",
+                    type: "POST",
+                    data: {
+                        inputData: inputVal,
+                        myCheckbox: checkboxVal
+                    },
+                    success: function(response) {
+                        var tableNames = response.table_names;
+                        var tables = response.tables;
+                        if (tables && tables.length > 0) {
+                            var resultHtml = '';
+                            for (var i = 0; i < tables.length; i++) {
+                                var tableName = tableNames[i];
+                                var tableData = JSON.parse(tables[i]);
+
+                                resultHtml += "<div>";
+                                resultHtml += "<h3>Таблица " + tableName + "</h3>";
+                                resultHtml += "<table id='table" + i + "' class='sortable'>";
+                                resultHtml += "<thead><tr>";
+                                resultHtml += "<th class='column1'>Номер</th>";
+                                resultHtml += "<th class='column2'>Поставщик</th>";
+                                resultHtml += "<th class='column3'>Наименование</th>";
+                                resultHtml += "<th class='column4'>Склад</th>";
+                                resultHtml += "<th class='column5'>Количество</th>";
+                                resultHtml += "<th class='column6'>Цена</th>";
+                                resultHtml += "<th class='column7'>Корзина</th>";
+                                resultHtml += "</tr></thead>";
+                                resultHtml += "<tbody>";
+                                for (var j = 0; j < tableData.length; j++) {
+                                    resultHtml += "<tr>";
+                                    resultHtml += "<td class='column1'>" + tableData[j].Номер + "</td>";
+                                    resultHtml += "<td class='column2'>" + tableData[j].Поставщик + "</td>";
+                                    resultHtml += "<td class='column3'>" + tableData[j].Наименование + "</td>";
+                                    resultHtml += "<td class='column4'>" + tableData[j].Склад + "</td>";
+                                    resultHtml += "<td class='column5'>" + tableData[j].Количество + "</td>";
+                                    resultHtml += "<td class='column6'>" + tableData[j].Цена + "</td>";
+                                    resultHtml += "<td class='column7'>" + tableData[j].Корзина + "</td>";
+                                    resultHtml += "</tr>";
+                                }
+                                resultHtml += "</tbody></table></div>";
+                            }
+                            $("#resultTable").html(resultHtml);
+                            for (var k = 0; k < tables.length; k++) {
+                                $("#table" + k).tablesorter({
+                                    sortList: [[0,0]]
+                                });
+                                applyTableFilter(k);
+                            }
+                        } else {
+                            $("#resultTable").html("Нет результатов.");
+                        }
+                    },
+                    error: function(xhr, errmsg, err) {
+                        console.log(xhr.status + ": " + xhr.responseText);
+                    }
+                });
+            });
+
+            function getCookie(name) {
+                var cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    var cookies = document.cookie.split(';');
+                    for (var i = 0; i < cookies.length; i++) {
+                        var cookie = jQuery.trim(cookies[i]);
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+
+            function applyTableFilter(tableIndex) {
+                var $table = $("#table" + tableIndex);
+                var $filteredRows = $table.find("tbody tr");
+                var filters = [];
+
+                $table.find("tbody td").contextmenu(function(e) {
+                    e.preventDefault();
+                    var $cell = $(this);
+                    var cellValue = $cell.text();
+                    var columnIndex = $cell.index();
+
+                    var menu = $("<ul class='filter-menu'></ul>");
+                    menu.append("<li class='filter-option'>Фильтровать по значению: " + cellValue + "</li>");
+                    menu.append("<li class='reset-filter-option'>Сбросить фильтр</li>");
+                    menu.appendTo("body").css({
+                        top: e.pageY + "px",
+                        left: e.pageX + "px"
+                    });
+
+                    menu.find(".filter-option").click(function() {
+                        var filterValue = $cell.text().toLowerCase();
+                        var filter = {
+                            columnIndex: columnIndex,
+                            filterValue: filterValue
+                            };
+                        filters.push(filter); // Добавление фильтра в массив
+
+                        applyFilters($table, filters); // Применение всех фильтров
+
+                        menu.remove();
+                    });
+
+                    menu.find(".reset-filter-option").click(function() {
+                        filters = []; // Сброс фильтров
+                        applyFilters($table, filters); // Применение всех фильтров
+
+                        menu.remove();
+                    });
+
+                    $(document).click(function() {
+                        menu.remove();
+                    });
+                });
+
+                function applyFilters($table, filters) {
+                    $table.find("tbody tr").removeClass("filtered").show();
+
+                    for (var i = 0; i < filters.length; i++) {
+                        var filter = filters[i];
+                        var columnIndex = filter.columnIndex;
+                        var filterValue = filter.filterValue;
+
+                        $table.find("tbody tr").filter(function() {
+                            var rowValue = $(this).find("td").eq(columnIndex).text().toLowerCase();
+                            return rowValue.indexOf(filterValue) === -1;
+                        }).addClass("filtered").hide();
+                    }
+                 }
+            }
+        });
+    </script>
+</body>
+</html>
