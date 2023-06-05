@@ -21,7 +21,7 @@
                 <div class="panel-body">
                         <form id="myForm">
                                 <div class="input-group login-userinput">
-                                        <span class="input-group-addon"><i class="fa-solid fa-gear" id="spinner"></i></span>
+                                        <span class="input-group-addon"><i class="fa-solid fa-gear" id="loading_label"></i></span>
                                         <input id="inputData" type="text" class="form-control" name="inputData" placeholder="Номер">
                                 </div>
 
@@ -57,8 +57,8 @@
                 e.preventDefault();
                 var inputVal = $("#inputData").val();
                 var checkboxVal = $("#myCheckbox").is(":checked");
-		var knopka = document.getElementById("spinner");
-                knopka.classList.add("fa-spin");
+		var loading = document.getElementById("loading_label");
+                loading.classList.add("fa-spin");
 
                 $.ajax({
                     url: "/process_data/",
@@ -70,7 +70,7 @@
                     success: function(response) {
                         var tableNames = response.table_names;
                         var tables = response.tables;
-			var element = document.getElementById("spinner");
+			var element = document.getElementById("loading_label");
 			element.classList.remove("fa-spin");
                         if (tables && tables.length > 0) {
                             var resultHtml = '';
@@ -99,7 +99,11 @@
                                 for (var j = 0; j < tableData.length; j++) {
                                     resultHtml += "<tr>";
 				    for (var a = 0; a < allkeys.length; a++){
-				    	resultHtml += "<td style='display: table-cell;'>" + tableData[j][allkeys[a]] + "</td>";
+				    	if(allkeys[a] == 'Корзина'){
+						resultHtml += "<td style='display: table-cell; font-size: 22px; cursor:pointer;text-align:center;'><i class='fa-solid fa-cart-plus' id='addCart'></i> </td>";
+					}
+
+				    	resultHtml += "<td style='display: table-cell;text-align:center;'>" + tableData[j][allkeys[a]] + "</td>";
 
 				    }
                                     resultHtml += "</tr>";
