@@ -52,7 +52,19 @@
                     }
                 }
             });
+	    $('#orderbutton').click(function() {
+		$.ajax({
+			url: "/order_by_button/",
+			type: "POST",
+			data: {
+				
+			}
+						
+			
 
+		})
+					
+	    })
             $("#myForm").submit(function(e) {
                 e.preventDefault();
                 var inputVal = $("#inputData").val();
@@ -86,7 +98,7 @@
                                 resultHtml += "<thead><tr class='footable-header'>";
 				for (var n = 0; n < allkeys.length; n++ ){
 					if(n+1 == allkeys.length){
-						 resultHtml += "<th class='footable-sortable footable-last-visible' style='display: table-cell;'>"+ allkeys[n] + " <i class='fa-solid fa-arrows-up-down'></i></th>";
+						 resultHtml += "<th class='footable-sortable footable-last-visible' style='display: table-cell;'>" + allkeys[n] + "</th>";
 					}else{
 						resultHtml += "<th class='footable-sortable' style='display: table-cell;'>"+ allkeys[n] +" <i class='fa-solid fa-arrows-up-down'></i></th>";
 					}
@@ -99,8 +111,9 @@
                                 for (var j = 0; j < tableData.length; j++) {
                                     resultHtml += "<tr>";
 				    for (var a = 0; a < allkeys.length; a++){
-				    	if(allkeys[a] == 'Корзина'){
-						resultHtml += "<td style='display: table-cell; font-size: 22px; cursor:pointer;text-align:center;'><i class='fa-solid fa-cart-plus' id='addCart'></i> </td>";
+				    	if(a+1 == allkeys.length){
+
+						resultHtml += "<td style='display: table-cell; text-align:center;'> <button type='button' id='orderbutton' class='btn btn-link'>КНОПКА</button> </td>";
 					}
 
 				    	resultHtml += "<td style='display: table-cell;text-align:center;'>" + tableData[j][allkeys[a]] + "</td>";
