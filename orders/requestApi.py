@@ -224,7 +224,4 @@ class DataScraper:
                 df = result[1]
                 tables.append(df)
 
-        # Объедините таблицы и передайте их в шаблон
-        # combined_table = pd.concat(tables, axis=1)  # Объединяем таблицы по горизонтали
-
         return table_names, tables
