@@ -1,9 +1,12 @@
-@import url(https://fonts.googleapis.com/css?family=Exo:400,500,500italic,400italic,600,600italic,700,700italic,800,800italic,300,300italic);
 table {
   width: 100%;
   border-collapse: collapse;
 }
+html, body{
+  font-family: 'Raleway', sans-serif;
+  background-color:#efefef;
 
+}
 th, td {
   border: 1px solid black;
   padding: 4px;
@@ -39,80 +42,6 @@ th {
   width: 10%;
 }
 
-.filtered {
-  display: none;
-}
-
-.filter-menu {
-  position: absolute;
-  background-color: white;
-  border: 1px solid #ccc;
-  padding: 5px;
-  list-style: none;
-}
-
-.filter-menu li {
-  cursor: pointer;
-  padding: 5px;
-}
-
-
-.login-form{width:390px!important;}
-.login-title{font-family: 'Exo', sans-serif;text-align:center;color: white;}
-.login-userinput{margin-bottom: 10px;}
-.login-button{margin-top:10px;}
-.login-options{margin-bottom:0px;}
-.login-forgot{float: right;}
-.panel-default{
-  border-color: #ddd;
-}
-.panel {
-  margin-bottom: 20px;
-  background-color: #fff;
-  border: 1px solid transparent;
-    border-top-color: transparent;
-    border-right-color: transparent;
-    border-bottom-color: transparent;
-    border-left-color: transparent;
-  border-radius: 4px;
-  	-webkit-box-shadow: 0px 0px 8px 0px rgba(34, 60, 80, 0.2);
-	-moz-box-shadow: 0px 0px 8px 0px rgba(34, 60, 80, 0.2);
-	box-shadow: 0px 0px 8px 0px rgba(34, 60, 80, 0.2);
-}
-.panel-body {
-  padding: 15px;
-}
-.input-group-addon {
-  padding: 6px 12px;
-  font-size: 21px;
-  font-weight: 400;
-  line-height: 1;
-  color: #555;
-  text-align: center;
-  background-color: #eee;
-  border: 1px solid #ccc;
-    border-right-color: rgb(204, 204, 204);
-    border-right-style: solid;
-    border-right-width: 1px;
-  border-radius: 4px;
-    border-top-right-radius: 4px;
-    border-bottom-right-radius: 4px;
-}
-.input-group-addon, .input-group-btn {
- 
-  white-space: nowrap;
-  vertical-align: middle;
-}
-.input-group .form-control, .input-group-addon, .input-group-btn {
-  display: table-cell;
-}
-.divtable {
-  padding: 5%;
-  width: 80%;
-  margin-left: 10%;
-  margin-bottom:1%;
-  padding: 1%;
-  -webkit-box-shadow: 0px 0px 8px 0px rgba(34, 60, 80, 0.2);
-  -moz-box-shadow: 0px 0px 8px 0px rgba(34, 60, 80, 0.2);
-  box-shadow: 0px 0px 8px 0px rgba(34, 60, 80, 0.2);
+.column7 {
+  width: 10%;
 }
