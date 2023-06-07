@@ -101,6 +101,31 @@ class DataScraper:
 
         return 'MIKADO', df
 
+    def ordering_micado(self):
+        clientID = '39727'
+        password = '39391467'
+        QTY = '1'
+        urlAPI = 'https://mikado-parts.ru//ws1/basket.asmx/Basket_Add'
+
+        headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+        data = {
+            'ZakazCode': self.code,
+            'QTY': QTY,
+            'DeliveryType': '0',
+            'Notes': 'Test',
+            'ClientID': clientID,
+            'Password': password,
+            'ExpressID': '0',
+            'StockID': '1'
+        }
+
+        try:
+            response = requests.post(urlAPI, headers=headers, data=data)
+            response.raise_for_status()
+            return 'Заказано'
+        except requests.exceptions.RequestException as e:
+            return 'Ошибка запроса ' + e
+
     def scrape_data_rosco(self):
         connect = {
             'wsdl': 'http://api.rossko.ru/service/v2.1/GetSearch',
@@ -126,6 +151,7 @@ class DataScraper:
                 'Поставщик': [],
                 'Наименование': [],
                 'Склад': [],
+                'Stock_id': [],
                 'Количество': [],
                 'Цена': [],
                 'Корзина': []
@@ -154,6 +180,7 @@ class DataScraper:
                             stock_list = stock['stock']
 
                             for stock_item in stock_list:
+                                stock_id = stock_item['id']
                                 stock_description = stock_item['description']
                                 if checkbox == 'false' and stock_description == 'Партнерский склад':
                                     continue
@@ -164,21 +191,22 @@ class DataScraper:
                                     data['Номер'].append(part_number)
                                     data['Поставщик'].append(brand)
                                     data['Наименование'].append(name)
+                                    data['Stock_id'].append(stock_id)
                                     data['Склад'].append(stock_description)
                                     data['Количество'].append(count)
                                     data['Цена'].append(price)
                                     data['Корзина'].append(basket.get(guid_number, ''))
 
             df = pd.DataFrame(data, columns=['Номер', 'Поставщик', 'Наименование', 'Склад',
-                                             'Количество', 'Цена', 'Корзина'])
+                                             'Stock_id', 'Количество', 'Цена', 'Корзина'])
 
             return 'ROSCO', df
         else:
             df = pd.DataFrame(columns=['Номер', 'Поставщик', 'Наименование', 'Склад',
-                                       'Количество', 'Цена', 'Корзина'])
+                                        'Stock_id', 'Количество', 'Цена', 'Корзина'])
             return 'ROSCO', df
 
-    def scrape_data_emex(self):
+    def ordering_rosco(self):
         pass
 
     def scrape_data(self):
