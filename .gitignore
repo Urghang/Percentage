@@ -213,3 +213,7 @@ ENV/
 /site
 
 # End of https://www.gitignore.io/api/macos,linux,django,python,pycharm
+/orders/static/img/ajax-loader.gif
+/orders/static/footable.bootstrap.min.css
+/orders/static/footable.min.js
+/orders/static/main.js
