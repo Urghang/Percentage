@@ -18,3 +18,17 @@ def process_data(request):
                              'tables': result_jsons})
 
     return JsonResponse({'error': 'Invalid request method'})
+
+def order_by_button(request):
+    if request.method == 'POST':
+        table_name = request.POST.get('table_name','')
+        qty_data = request.POST.get('qty', '')
+        part_id = request.POST.get('partId', '')
+        storage_id = request.POST.get('store_id', '')
+        provider_id = request.POST.get('provider_id', '')
+
+
+            
+
+
+
