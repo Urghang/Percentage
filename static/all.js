@@ -22,6 +22,6 @@
 
             success: function(response) {
                 var result = response.result;
-
+                alert(result);
             }
 
