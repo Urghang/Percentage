@@ -6,6 +6,31 @@ from zeep import Client
 from zeep.transports import Transport
 
 
+def ordering_micado(QTY, code):
+    clientID = '39727'
+    password = '39391467'
+    urlAPI = 'https://mikado-parts.ru//ws1/basket.asmx/Basket_Add'
+
+    headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+    data = {
+        'ZakazCode': code,
+        'QTY': QTY,
+        'DeliveryType': '0',
+        'Notes': 'Test',
+        'ClientID': clientID,
+        'Password': password,
+        'ExpressID': '0',
+        'StockID': '1'
+    }
+
+    try:
+        response = requests.post(urlAPI, headers=headers, data=data)
+        response.raise_for_status()
+        return 'Заказано'
+    except requests.exceptions.RequestException as e:
+        return 'Ошибка запроса ' + e
+
+
 def get_quantity_in_basket_mikado():
     clientID = '39727'
     password = '39391467'
@@ -100,33 +125,6 @@ class DataScraper:
                                          'Склад', 'Количество', 'Цена', 'Корзина'])
 
         return 'MIKADO', df
-
-    def ordering_micado(self, QTY, code):
-
-        
-        clientID = '39727'
-        password = '39391467'
-        #QTY = '1'
-        urlAPI = 'https://mikado-parts.ru//ws1/basket.asmx/Basket_Add'
-
-        headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-        data = {
-            'ZakazCode': code, #SELF.CODE
-            'QTY': QTY,
-            'DeliveryType': '0',
-            'Notes': 'Test',
-            'ClientID': clientID,
-            'Password': password,
-            'ExpressID': '0',
-            'StockID': '1'
-        }
-
-        try:
-            response = requests.post(urlAPI, headers=headers, data=data)
-            response.raise_for_status()
-            return 'Заказано'
-        except requests.exceptions.RequestException as e:
-            return 'Ошибка запроса ' + e
 
     def scrape_data_rosco(self):
         connect = {

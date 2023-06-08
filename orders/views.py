@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-from orders.requestApi import DataScraper
+from orders.requestApi import DataScraper, ordering_micado
 
 
 def index(request):
@@ -19,18 +19,14 @@ def process_data(request):
 
     return JsonResponse({'error': 'Invalid request method'})
 
+
 def new_order(request):
     if request.method == 'POST':
         table_name = request.POST.get('tablename', '')
-        qty_data = request.POST.get('qty', '') #Количество
-        part_id = request.POST.get('partId', '') #Номер детали
-        stock_id = request.POST.get('stock_id', '') #StockID
-        postavshik_id = request.POST.get('postavshik_id', '') #Поставщикi
-        #TEMP
-        if table_name == "MICADO":
-            DataScraper.ordering_micado(qty_data, part_id) #Количество, айди детали
+        qty_data = request.POST.get('qty', '')
+        part_id = request.POST.get('partId', '')
+        stock_id = request.POST.get('stock_id', '')
+        postavshik_id = request.POST.get('postavshik_id', '')
 
-            
-
-
-
+        if table_name == "MIKADO":
+            ordering_micado(qty_data, part_id)
