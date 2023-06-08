@@ -30,4 +30,5 @@ def new_order(request):
 
         if table_name == "MIKADO":
             result = ordering_micado(qty_data, part_id)
+
             return JsonResponse({'result': result})

@@ -212,6 +212,7 @@ class DataScraper:
     def scrape_data(self):
         tables = []
         table_names = []
+
         with concurrent.futures.ThreadPoolExecutor() as executor:
             futures = []
             for params in self.parameter_sets:
