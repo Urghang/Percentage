@@ -10,16 +10,28 @@
                         	url: "/new_order/",
                         	type: "POST",
                         	data: {
-                    tablename: tname,
+                    			tablename: tname,
 					qty: qty,
 					partId: part_id,
 					postavshik_id: postavshik,
 					stock_id: 1
                         	},
                         	 success: function(response) {
-                var result = response.result;
-                alert(result);
-            }
+                			var result = response.result;
+					notify({
+      						type: "success",
+      						title: "Товар "+ part_id + " заказан",
+      						message: result,
+     						position: {
+        						x: "right",
+        						y: "top"
+      							},
+						autoHide: true,
+						delay: 10000,
+      						
+    							});
+                			
+            					}
                 	});
 
                 });
