@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{% static 'styles.css' %}">
     <link rel="stylesheet" href="{% static 'footable.bootstrap.min.css' %}">
     <script type="text/javascript" src="{% static 'footable.min.js' %}"></script>
-    
+    <script type="text/javascript" src="{% static 'all.js' %}"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
@@ -27,8 +27,6 @@
 
                                 <button class="btn btn btn-outline-dark" style="width:100%;" type="submit" id="submitbutton"><i class="fa fa-search"></i> Запрос</button>
                                 <div class="checkbox login-options">
-                                        <label><input type="checkbox" id="myCheckbox" name="myCheckbox"/> Партнерский склад</label>
-
                                 </div>
                         </form>
                 </div>
@@ -38,183 +36,171 @@
     <div id="resultTable"></div>
 
     <script>
-        $(document).ready(function() {
-            var csrftoken = getCookie('csrftoken');
+    $(document).ready(function() {
+    var csrftoken = getCookie('csrftoken');
 
-            function csrfSafeMethod(method) {
-                return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
+    function csrfSafeMethod(method) {
+        return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
+    }
+
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
             }
+        }
+    });
 
-            $.ajaxSetup({
-                beforeSend: function(xhr, settings) {
-                    if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                    }
-                }
-            });
-	    $('#orderbutton').click(function() {
-		$.ajax({
-			url: "/order_by_button/",
-			type: "POST",
-			data: {
-				
-			}
-						
-			
+    $('#orderbutton').click(function() {
+        $.ajax({
+            url: "/order_by_button/",
+            type: "POST",
+            data: {}
+        });
+    });
 
-		})
-					
-	    })
-            $("#myForm").submit(function(e) {
-                e.preventDefault();
-                var inputVal = $("#inputData").val();
-                var checkboxVal = $("#myCheckbox").is(":checked");
-		var loading = document.getElementById("loading_label");
-                loading.classList.add("fa-spin");
+    $("#myForm").submit(function(e) {
+        e.preventDefault();
+        var inputVal = $("#inputData").val();
+        var checkboxVal = $("#myCheckbox").is(":checked");
+        var loading = document.getElementById("loading_label");
+        loading.classList.add("fa-spin");
 
-                $.ajax({
-                    url: "/process_data/",
-                    type: "POST",
-                    data: {
-                        inputData: inputVal,
-                        myCheckbox: checkboxVal
-                    },
-                    success: function(response) {
-                        var tableNames = response.table_names;
-                        var tables = response.tables;
-			var element = document.getElementById("loading_label");
-			element.classList.remove("fa-spin");
-                        if (tables && tables.length > 0) {
-                            var resultHtml = '';
-			    
-                            for (var i = 0; i < tables.length; i++) {
-                                var tableName = tableNames[i];
-                                var tableData = JSON.parse(tables[i]);
-				var allkeys = Object.keys(tableData[0]);
-                                resultHtml += "<div class='divtable'>";
-                                resultHtml += "<h3>Таблица " + tableName + "</h3>";
-				
-                                resultHtml += "<table id='table" + i + "' class='table table-striped footable footable-1 footable-filtering footable-filtering-right footable-paging footable-paging-center breakpoint-lg'>";
-                                resultHtml += "<thead><tr class='footable-header'>";
-				for (var n = 0; n < allkeys.length; n++ ){
-					if(n+1 == allkeys.length){
-						 resultHtml += "<th class='footable-sortable footable-last-visible' style='display: table-cell;'>" + allkeys[n] + "</th>";
-					}else{
-						resultHtml += "<th class='footable-sortable' style='display: table-cell;'>"+ allkeys[n] +" <i class='fa-solid fa-arrows-up-down'></i></th>";
-					}
+        $.ajax({
+            url: "/process_data/",
+            type: "POST",
+            data: {
+                inputData: inputVal,
+                myCheckbox: checkboxVal
+            },
+            success: function(response) {
+                var tableNames = response.table_names;
+                var tables = response.tables;
+                var element = document.getElementById("loading_label");
+                var resultHtml = '';
+                element.classList.remove("fa-spin");
+                if (tables && tables.length > 0) {
+                    for (var i = 0; i < tables.length; i++) {
+                        var tableName = tableNames[i];
+                        var tableData = JSON.parse(tables[i]);
 
+                        if (tableData.length !== 0) {
+                            resultHtml += "<div class='divtable'>";
+                            resultHtml += "<h3>Таблица " + tableName + "</h3>";
+                            resultHtml += "<table id='table" + i + "' class='table table-striped footable footable-1 footable-filtering footable-filtering-right footable-paging footable-paging-center breakpoint-lg'>";
+                            resultHtml += "<thead><tr class='footable-header'>";
+                            var allkeys = Object.keys(tableData[0]);
 
-				}
-         
-                                resultHtml += "</tr></thead>";
-                                resultHtml += "<tbody>";
+                            for (var n = 0; n < allkeys.length; n++) {
+                                if (n + 1 == allkeys.length) {
+                                    resultHtml += "<th class='footable-sortable footable-last-visible' style='display: table-cell;'>" + allkeys[n] + "</th>";
+                                } else {
+                                    resultHtml += "<th class='footable-sortable' style='display: table-cell;'>" + allkeys[n] + " <i class='fa-solid fa-arrows-up-down'></i></th>";
+                                }
+                            }
+                            resultHtml += "</tr></thead>";
+                             resultHtml += "<tbody>";
                                 for (var j = 0; j < tableData.length; j++) {
                                     resultHtml += "<tr>";
-				    for (var a = 0; a < allkeys.length; a++){
-				    	if(a+1 == allkeys.length){
-
-						resultHtml += "<td style='display: table-cell; text-align:center;'> <button type='button' id='orderbutton' class='btn btn-link'>КНОПКА</button> </td>";
-					}
-
-				    	resultHtml += "<td style='display: table-cell;text-align:center;'>" + tableData[j][allkeys[a]] + "</td>";
-
-				    }
+                                    for (var a = 0; a < allkeys.length; a++){
+                                        resultHtml += "<td style='display: table-cell;text-align:center;'>" + tableData[j][allkeys[a]] + "</td>";
+                                    }
+                                    resultHtml += "<td style='display: table-cell; text-align:center;'> <input type='number' name='quant[1]' class='form-control input-number' value='1' min='1' max='100'><button tname="+ tableName+" type='button' id='alert' class='btn btn-link'>КНОПКА</button> </td>";
                                     resultHtml += "</tr>";
                                 }
+
                                 resultHtml += "</tbody></table></div>";
-                            }
-                            $("#resultTable").html(resultHtml);
-                            for (var k = 0; k < tables.length; k++) {
-                                $("#table" + k).tablesorter({
-                                    sortList: [[0,0]]
-                                });
-                                applyTableFilter(k);
-                            }
-                        } else {
-                            $("#resultTable").html("Нет результатов.");
-                        }
-                    },
-                    error: function(xhr, errmsg, err) {
-                        console.log(xhr.status + ": " + xhr.responseText);
-                    }
-                });
-            });
 
-            function getCookie(name) {
-                var cookieValue = null;
-                if (document.cookie && document.cookie !== '') {
-                    var cookies = document.cookie.split(';');
-                    for (var i = 0; i < cookies.length; i++) {
-                        var cookie = jQuery.trim(cookies[i]);
-                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                            break;
+                        }
+                        $("#resultTable").html(resultHtml);
+                        for (var k = 0; k < tables.length; k++) {
+                            $("#table" + k).tablesorter({
+                                sortList: [[0, 0]]
+                            });
+                            applyTableFilter(k);
                         }
                     }
+                } else {
+                    $("#resultTable").html("Нет результатов.");
                 }
-                return cookieValue;
-            }
-
-            function applyTableFilter(tableIndex) {
-                var $table = $("#table" + tableIndex);
-                var $filteredRows = $table.find("tbody tr");
-                var filters = [];
-
-                $table.find("tbody td").contextmenu(function(e) {
-                    e.preventDefault();
-                    var $cell = $(this);
-                    var cellValue = $cell.text();
-                    var columnIndex = $cell.index();
-
-                    var menu = $("<ul class='filter-menu'></ul>");
-                    menu.append("<li class='filter-option'>Фильтровать по значению: " + cellValue + "</li>");
-                    menu.append("<li class='reset-filter-option'>Сбросить фильтр</li>");
-                    menu.appendTo("body").css({
-                        top: e.pageY + "px",
-                        left: e.pageX + "px"
-                    });
-
-                    menu.find(".filter-option").click(function() {
-                        var filterValue = $cell.text().toLowerCase();
-                        var filter = {
-                            columnIndex: columnIndex,
-                            filterValue: filterValue
-                            };
-                        filters.push(filter); // Добавление фильтра в массив
-
-                        applyFilters($table, filters); // Применение всех фильтров
-
-                        menu.remove();
-                    });
-
-                    menu.find(".reset-filter-option").click(function() {
-                        filters = []; // Сброс фильтров
-                        applyFilters($table, filters); // Применение всех фильтров
-
-                        menu.remove();
-                    });
-
-                    $(document).click(function() {
-                        menu.remove();
-                    });
-                });
-
-                function applyFilters($table, filters) {
-                    $table.find("tbody tr").removeClass("filtered").show();
-
-                    for (var i = 0; i < filters.length; i++) {
-                        var filter = filters[i];
-                        var columnIndex = filter.columnIndex;
-                        var filterValue = filter.filterValue;
-
-                        $table.find("tbody tr").filter(function() {
-                            var rowValue = $(this).find("td").eq(columnIndex).text().toLowerCase();
-                            return rowValue.indexOf(filterValue) === -1;
-                        }).addClass("filtered").hide();
-                    }
-                 }
+            },
+            error: function(xhr, errmsg, err) {
+                console.log(xhr.status + ": " + xhr.responseText);
             }
         });
+    });
+
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function applyTableFilter(tableIndex) {
+        var $table = $("#table" + tableIndex);
+        var filters = [];
+
+        $table.find("tbody td").contextmenu(function(e) {
+            e.preventDefault();
+            var $cell = $(this);
+            var cellValue = $cell.text();
+            var columnIndex = $cell.index();
+
+            var menu = $("<ul class='filter-menu'></ul>");
+            menu.append("<li class='filter-option'>Фильтровать по значению: " + cellValue + "</li>");
+            menu.append("<li class='reset-filter-option'>Сбросить фильтр</li>");
+            menu.appendTo("body").css({
+                top: e.pageY + "px",
+                left: e.pageX + "px"
+            });
+
+            menu.find(".filter-option").click(function() {
+                var filterValue = $cell.text().toLowerCase();
+                var filter = {
+                    columnIndex: columnIndex,
+                    filterValue: filterValue
+                };
+                filters.push(filter);
+                applyFilters($table, filters);
+                menu.remove();
+            });
+
+            menu.find(".reset-filter-option").click(function() {
+                filters = [];
+                applyFilters($table, filters);
+                menu.remove();
+            });
+
+            $(document).click(function() {
+                menu.remove();
+            });
+        });
+
+        function applyFilters($table, filters) {
+            $table.find("tbody tr").removeClass("filtered").show();
+
+            for (var i = 0; i < filters.length; i++) {
+                var filter = filters[i];
+                var columnIndex = filter.columnIndex;
+                var filterValue = filter.filterValue;
+
+                $table.find("tbody tr").filter(function() {
+                    var rowValue = $(this).find("td").eq(columnIndex).text().toLowerCase();
+                    return rowValue.indexOf(filterValue) === -1;
+                }).addClass("filtered").hide();
+            }
+        }
+    }
+});
     </script>
 </body>
 </html>

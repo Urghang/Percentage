@@ -101,15 +101,17 @@ class DataScraper:
 
         return 'MIKADO', df
 
-    def ordering_micado(self):
+    def ordering_micado(self, QTY, code):
+
+        
         clientID = '39727'
         password = '39391467'
-        QTY = '1'
+        #QTY = '1'
         urlAPI = 'https://mikado-parts.ru//ws1/basket.asmx/Basket_Add'
 
         headers = {'Content-Type': 'application/x-www-form-urlencoded'}
         data = {
-            'ZakazCode': self.code,
+            'ZakazCode': code, #SELF.CODE
             'QTY': QTY,
             'DeliveryType': '0',
             'Notes': 'Test',
