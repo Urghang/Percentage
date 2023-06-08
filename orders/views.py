@@ -29,4 +29,5 @@ def new_order(request):
         postavshik_id = request.POST.get('postavshik_id', '')
 
         if table_name == "MIKADO":
-            ordering_micado(qty_data, part_id)
+            result = ordering_micado(qty_data, part_id)
+            return JsonResponse({'result': result})
