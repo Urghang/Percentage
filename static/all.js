@@ -5,10 +5,12 @@
 	 		var postavshik = current_row.find('td:eq(1)').html()
                         var qty =$(this).closest('td').find('input[type=number]').val();
 	 		var tname = $(this).attr('tname');
+	 		
 	 		$.ajax({
                         	url: "/new_order/",
                         	type: "POST",
                         	data: {
+					tablename: tname,
 					qty: qty,
 					partId: part_id,
 					postavshik_id: postavshik,
