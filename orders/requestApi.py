@@ -26,7 +26,7 @@ def ordering_micado(QTY, code):
     try:
         response = requests.post(urlAPI, headers=headers, data=data)
         response.raise_for_status()
-        return 'Заказано'
+        return 'Заказано' + code + ' ' + QTY
     except requests.exceptions.RequestException as e:
         return 'Ошибка запроса ' + e
 
