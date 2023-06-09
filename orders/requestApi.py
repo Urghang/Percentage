@@ -31,7 +31,7 @@ def ordering_micado(QTY, code, comment):
         return 'Ошибка запроса ' + e
 
 
-def ordering_rosco(code, brand, stock_id, QTY):
+def ordering_rosco(code, brand, stock_id, QTY, comment):
     connect = {
         'wsdl': 'http://api.rossko.ru/service/v2.1/GetCheckout',
         'options': {
@@ -60,7 +60,8 @@ def ordering_rosco(code, brand, stock_id, QTY):
                 'partnumber': code,
                 'brand': brand,
                 'stock': stock_id,
-                'count': QTY
+                'count': QTY,
+                'comment': comment
             }
         }]
     }

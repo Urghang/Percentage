@@ -34,5 +34,5 @@ def new_order(request):
 
             return JsonResponse({'result': result})
         elif table_name == "ROSCO":
-            result = ordering_rosco(part_id, postavshik_id, stock_id, qty_data)
+            result = ordering_rosco(part_id, postavshik_id, stock_id, qty_data, comment)
             return JsonResponse({'result': result})
