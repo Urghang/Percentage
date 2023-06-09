@@ -168,34 +168,60 @@ class DataScraper:
                 part_number = part['partnumber']
                 brand = part['brand']
                 name = part['name']
+                stocks = part['stocks']
                 crosses = part['crosses']
+
+                if stocks is not None and 'stock' in stocks:
+                    stock_list = stocks['stock']
+
+                    for stock_item in stock_list:
+                        stock_id = stock_item['id']
+                        stock_description = stock_item['description']
+                        if checkbox == 'false' and stock_description == 'Партнерский склад':
+                            continue
+                        else:
+                            price = stock_item['price']
+                            count = stock_item['count']
+
+                            data['Номер'].append(part_number)
+                            data['Поставщик'].append(brand)
+                            data['Наименование'].append(name)
+                            data['Stock_id'].append(stock_id)
+                            data['Склад'].append(stock_description)
+                            data['Количество'].append(count)
+                            data['Цена'].append(price)
+                            data['Корзина'].append(basket.get(guid_number, ''))
 
                 if crosses is not None and 'Part' in crosses:
                     cross_parts = crosses['Part']
 
                     for cross_part in cross_parts:
-                        stock = cross_part['stocks']
+                        guid_number_cross = cross_part['guid']
+                        part_number_cross = cross_part['partnumber']
+                        brand_cross = cross_part['brand']
+                        name_cross = cross_part['name']
+                        stocks_cross = cross_part['stocks']
 
-                        if stock is not None and 'stock' in stock:
-                            stock_list = stock['stock']
+                        if stocks_cross is not None and 'stock' in stocks_cross:
+                            stock_cross_list = stocks_cross['stock']
 
-                            for stock_item in stock_list:
-                                stock_id = stock_item['id']
-                                stock_description = stock_item['description']
-                                if checkbox == 'false' and stock_description == 'Партнерский склад':
+                            for stock_cross_item in stock_cross_list:
+                                stock_id_cross = stock_cross_item['id']
+                                stock_description_cross = stock_cross_item['description']
+                                if checkbox == 'false' and stock_description_cross == 'Партнерский склад':
                                     continue
                                 else:
-                                    price = stock_item['price']
-                                    count = stock_item['count']
+                                    price_cross = stock_cross_item['price']
+                                    count_cross = stock_cross_item['count']
 
-                                    data['Номер'].append(part_number)
-                                    data['Поставщик'].append(brand)
-                                    data['Наименование'].append(name)
-                                    data['Stock_id'].append(stock_id)
-                                    data['Склад'].append(stock_description)
-                                    data['Количество'].append(count)
-                                    data['Цена'].append(price)
-                                    data['Корзина'].append(basket.get(guid_number, ''))
+                                    data['Номер'].append(part_number_cross)
+                                    data['Поставщик'].append(brand_cross)
+                                    data['Наименование'].append(name_cross)
+                                    data['Stock_id'].append(stock_id_cross)
+                                    data['Склад'].append(stock_description_cross)
+                                    data['Количество'].append(count_cross)
+                                    data['Цена'].append(price_cross)
+                                    data['Корзина'].append(basket.get(guid_number_cross, ''))
 
             df = pd.DataFrame(data, columns=['Номер', 'Поставщик', 'Наименование', 'Склад',
                                              'Stock_id', 'Количество', 'Цена', 'Корзина'])
@@ -203,7 +229,7 @@ class DataScraper:
             return 'ROSCO', df
         else:
             df = pd.DataFrame(columns=['Номер', 'Поставщик', 'Наименование', 'Склад',
-                                        'Stock_id', 'Количество', 'Цена', 'Корзина'])
+                                       'Stock_id', 'Количество', 'Цена', 'Корзина'])
             return 'ROSCO', df
 
     def ordering_rosco(self):
