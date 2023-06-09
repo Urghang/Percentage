@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-from orders.requestApi import DataScraper, ordering_micado
+from orders.requestApi import DataScraper, ordering_micado, ordering_rosco
 
 
 def index(request):
@@ -27,8 +27,12 @@ def new_order(request):
         part_id = request.POST.get('partId', '')
         stock_id = request.POST.get('stock_id', '')
         postavshik_id = request.POST.get('postavshik_id', '')
+        comment = request.POST.get('comment', '')
 
         if table_name == "MIKADO":
-            result = ordering_micado(qty_data, part_id)
+            result = ordering_micado(qty_data, part_id, comment)
 
+            return JsonResponse({'result': result})
+        elif table_name == "ROSCO":
+            result = ordering_rosco(part_id, postavshik_id, stock_id, qty_data)
             return JsonResponse({'result': result})

@@ -6,7 +6,7 @@ from zeep import Client
 from zeep.transports import Transport
 
 
-def ordering_micado(QTY, code):
+def ordering_micado(QTY, code, comment):
     clientID = '39727'
     password = '39391467'
     urlAPI = 'https://mikado-parts.ru//ws1/basket.asmx/Basket_Add'
@@ -16,7 +16,7 @@ def ordering_micado(QTY, code):
         'ZakazCode': code,
         'QTY': QTY,
         'DeliveryType': '0',
-        'Notes': 'Test',
+        'Notes': comment,
         'ClientID': clientID,
         'Password': password,
         'ExpressID': '0',
