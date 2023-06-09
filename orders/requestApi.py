@@ -31,6 +31,50 @@ def ordering_micado(QTY, code):
         return 'Ошибка запроса ' + e
 
 
+def ordering_rosco(code, brand, stock_id, QTY):
+    connect = {
+        'wsdl': 'http://api.rossko.ru/service/v2.1/GetCheckout',
+        'options': {
+            'transport': Transport(timeout=1),
+        }
+    }
+
+    params = {
+        'KEY1': 'aae7b144f41c0ef7d840bc948de6dbbc',
+        'KEY2': '24e09553d43de0243375642f07efba6d',
+        'delivery': {
+            'delivery_id': '000000002',
+            'address_id': '144623'
+        },
+        'payment': {
+            'payment_id': '1',
+            'requisite_id': '29277'
+        },
+        'contact': {
+            'name': 'Aleks',
+            'phone': '+74012714217'
+        },
+        'delivery_parts': True,
+        'PARTS': [{
+            'Part': {
+                'partnumber': code,
+                'brand': brand,
+                'stock': stock_id,
+                'count': QTY
+            }
+        }]
+    }
+
+    client = Client(connect['wsdl'], transport=connect['options']['transport'])
+
+    result = client.service.GetCheckout(**params)
+
+    if result['success']:
+        return 'Товар ' + code + ' ' + QTY + ' шт. Успешно заказан.'
+    else:
+        return result['ItemErrorList']
+
+
 def get_quantity_in_basket_mikado():
     clientID = '39727'
     password = '39391467'
@@ -231,9 +275,6 @@ class DataScraper:
             df = pd.DataFrame(columns=['Номер', 'Поставщик', 'Наименование', 'Склад',
                                        'Stock_id', 'Количество', 'Цена', 'Корзина'])
             return 'ROSCO', df
-
-    def ordering_rosco(self):
-        pass
 
     def scrape_data(self):
         tables = []
