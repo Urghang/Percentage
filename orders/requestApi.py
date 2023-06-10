@@ -114,6 +114,23 @@ def get_quantity_in_basket_rosco():
     result = client.service.GetOrders(**param)
 
     dict_order = {}
+    dict_statuses = {
+        0: 'ждёт подтверждения',
+        1: 'комплектуется',
+        2: 'отгружено',
+        3: 'готово к отгрузке',
+        5: 'ожидаем поступление',
+        6: 'на складе филиала',
+        7: 'нет в наличии',
+        8: 'отменён клиентом',
+        9: 'просрочен',
+        31: 'ожидаем товар на складе',
+        32: 'возврат на согласовании',
+        33: 'товар на экспертизе',
+        34: 'возврат отклонён',
+        35: 'возврат частично отклонён',
+        36: 'товар возвращён'
+    }
     all_items = result['OrdersList']['Order']
 
     for item in all_items:
@@ -122,7 +139,8 @@ def get_quantity_in_basket_rosco():
         for part in parts:
             code = part['guid']
             quantity = part['count']
-            dict_order[code] = quantity
+            status = dict_statuses[part['status']]
+            dict_order[code] = quantity, status
 
     return dict_order
 
@@ -199,7 +217,8 @@ class DataScraper:
                 'Stock_id': [],
                 'Количество': [],
                 'Цена': [],
-                'Корзина': []
+                'Корзина': [],
+                'Статус': []
             }
 
             basket = get_quantity_in_basket_rosco()
@@ -235,7 +254,11 @@ class DataScraper:
                             data['Склад'].append(stock_description)
                             data['Количество'].append(count)
                             data['Цена'].append(price)
-                            data['Корзина'].append(basket.get(guid_number, ''))
+                            basket_tuple = basket.get(guid_number)
+                            basket_count = basket_tuple[0] if basket_tuple else ''
+                            data['Корзина'].append(basket_count)
+                            basket_status = basket_tuple[1] if basket_tuple else ''
+                            data['Статус'].append(basket_status)
 
                 if crosses is not None and 'Part' in crosses:
                     cross_parts = crosses['Part']
@@ -266,15 +289,19 @@ class DataScraper:
                                     data['Склад'].append(stock_description_cross)
                                     data['Количество'].append(count_cross)
                                     data['Цена'].append(price_cross)
-                                    data['Корзина'].append(basket.get(guid_number_cross, ''))
+                                    basket_cross_tuple = basket.get(guid_number_cross,)
+                                    basket_count_cross = basket_cross_tuple[0] if basket_cross_tuple else ''
+                                    data['Корзина'].append(basket_count_cross)
+                                    basket_status_cross = basket_cross_tuple[1] if basket_cross_tuple else ''
+                                    data['Статус'].append(basket_status_cross)
 
             df = pd.DataFrame(data, columns=['Номер', 'Поставщик', 'Наименование', 'Склад',
-                                             'Stock_id', 'Количество', 'Цена', 'Корзина'])
+                                             'Stock_id', 'Количество', 'Цена', 'Корзина', 'Статус'])
 
             return 'ROSCO', df
         else:
             df = pd.DataFrame(columns=['Номер', 'Поставщик', 'Наименование', 'Склад',
-                                       'Stock_id', 'Количество', 'Цена', 'Корзина'])
+                                       'Stock_id', 'Количество', 'Цена', 'Корзина', 'Статус'])
             return 'ROSCO', df
 
     def scrape_data(self):
