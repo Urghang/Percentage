@@ -11,6 +11,17 @@ $(document).on('click', '[id="alert"]', function(e) {
     $("#modal_tname").attr("tname", tname);
 });
 
+$(document).on('click', '[id="clear_modal"]', function(e) {
+	
+  // Очистка поля "Количество"
+  var qtyField = document.getElementById('modal_qty');
+  qtyField.value = '1';
+
+  // Очистка поля "Комментарий"
+  var commentField = document.getElementById('modal_comment');
+  commentField.value = '';
+});
+
 $(document).on('click', '[id="modal_st_id"]', function(e) {
     var tname = $("#modal_tname").attr("tname");
     var part_id = $("#modal_part_id").val();
@@ -42,6 +53,13 @@ $(document).on('click', '[id="modal_st_id"]', function(e) {
                 autoHide: true,
                 delay: 10000
             });
+	var qtyField = document.getElementById('modal_qty');
+ 	qtyField.value = '1';
+
+  	// Очистка поля "Комментарий"
+  	var commentField = document.getElementById('modal_comment');
+  	commentField.value = '';
+
         }
     });
 });
