@@ -29,6 +29,14 @@ $(document).on('click', '[id="modal_st_id"]', function(e) {
     var qty = $("#modal_qty").val();
     var comment = $("#modal_comment").val();
     var stock_id = $("#modal_st_id").attr("stock_id");
+
+    var qtyField = document.getElementById('modal_qty');
+    qtyField.value = '1';
+
+
+    // Очистка поля "Комментарий"
+    var commentField = document.getElementById('modal_comment');
+    commentField.value = '';
     $.ajax({
         url: "/new_order/",
         type: "POST",
@@ -53,12 +61,6 @@ $(document).on('click', '[id="modal_st_id"]', function(e) {
                 autoHide: true,
                 delay: 10000
             });
-	var qtyField = document.getElementById('modal_qty');
- 	qtyField.value = '1';
-
-  	// Очистка поля "Комментарий"
-  	var commentField = document.getElementById('modal_comment');
-  	commentField.value = '';
 
         }
     });
